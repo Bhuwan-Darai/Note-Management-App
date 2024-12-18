@@ -8,6 +8,25 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { api } from "@/api";
+import { useQuery } from "@tanstack/react-query";
+
+type PostData = {
+  id?: number;
+  name: string;
+  email: string;
+};
+
+// Fetch data from the API with React Query
+const fetchData = async (): Promise<PostData> => {
+  const response = await api.get("/hello");
+  return response.data;
+};
+
+// Post data to the API with React Query
+const postData = async (data: PostData) => {
+  const response = await api.post("/addUser", data);
+  return response.data;
+};
 
 export default function HomeScreen() {
   const [data, setData] = useState({
@@ -19,21 +38,31 @@ export default function HomeScreen() {
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get("/hello");
-        console.log(response.data);
-        setData(response.data);
-      } catch (err) {
-        setError("Failed to fetch data");
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await api.get("/hello");
+  //       console.log(response.data);
+  //       setData(response.data);
+  //     } catch (err) {
+  //       setError("Failed to fetch data");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
+
+  // fetch data with react query
+  const {
+    data: fetchedData,
+    isLoading,
+    isError,
+    error: queryError,
+  } = useQuery({ queryKey: ["data"], queryFn: fetchData });
+
+  console.log("fetched data", fetchedData);
 
   const handleChange = (field: "name" | "email", value: string) => {
     setData((prevData) => ({ ...prevData, [field]: value }));
