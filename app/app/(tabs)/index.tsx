@@ -8,17 +8,17 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { api } from "@/api";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 
 type PostData = {
-  id?: number;
   name: string;
   email: string;
 };
 
 // Fetch data from the API with React Query
-const fetchData = async (): Promise<PostData> => {
+const fetchData = async () => {
   const response = await api.get("/hello");
+  console.log(response.data);
   return response.data;
 };
 
@@ -42,7 +42,7 @@ export default function HomeScreen() {
   //   const fetchData = async () => {
   //     try {
   //       const response = await api.get("/hello");
-  //       console.log(response.data);
+  //       console.log("data in useeffect", response.data);
   //       setData(response.data);
   //     } catch (err) {
   //       setError("Failed to fetch data");
@@ -63,6 +63,16 @@ export default function HomeScreen() {
   } = useQuery({ queryKey: ["data"], queryFn: fetchData });
 
   console.log("fetched data", fetchedData);
+
+  // mutation to post data
+  const mutation = useMutation<any, Error, PostData>(postData, {
+    onSuccess: () => {
+      setSuccessMessage("User data submitted successfully");
+    },
+    onError: (error: any) => {
+      setErrorMessage("Failed to submit user");
+    },
+  });
 
   const handleChange = (field: "name" | "email", value: string) => {
     setData((prevData) => ({ ...prevData, [field]: value }));

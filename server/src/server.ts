@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cors()); // Enable CORS for all origins
 
 // Default route - sends a welcome message
-app.get("/", (req, res) => {
+app.get("/hello", (req, res) => {
   res.json({ message: "Hello from the server!" });
 });
 
